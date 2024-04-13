@@ -1,4 +1,5 @@
 import sys
+import fitz  # PyMuPDF
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QTextEdit, QPushButton, QVBoxLayout, QFileDialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -7,6 +8,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
+
 class ResumeBuilder(QWidget):
     def __init__(self):
         super().__init__()
@@ -14,7 +16,7 @@ class ResumeBuilder(QWidget):
     
     def initUI(self):
         self.setWindowTitle('Resume Builder')
-        self.setGeometry(100, 100, 400, 500)
+        self.setGeometry(100, 100, 400, 500) #Adjust According to your requirements
 
         self.name_label = QLabel('Full Name:')
         self.name_edit = QLineEdit()
@@ -32,10 +34,16 @@ class ResumeBuilder(QWidget):
         self.exp_edit = QTextEdit()
 
         self.skills_label = QLabel('Skills:')
-        self.skills_edit = QLineEdit()
+        self.skills_edit = QTextEdit()
+
+        self.skills_label = QLabel('Certifications:')
+        self.skills_edit = QTextEdit()
 
         self.submit_button = QPushButton('Generate Resume')
         self.submit_button.clicked.connect(self.generate_resume)
+
+        self.import_button = QPushButton('Import Resume')
+        self.import_button.clicked.connect(self.import_resume)
 
         layout = QVBoxLayout()
         layout.addWidget(self.name_label)
@@ -53,8 +61,58 @@ class ResumeBuilder(QWidget):
         layout.addWidget(self.skills_label)
         layout.addWidget(self.skills_edit)
         layout.addWidget(self.submit_button)
+        layout.addWidget(self.import_button)
 
         self.setLayout(layout)
+        self.update()
+
+
+    def import_resume(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Import Resume", "", "PDF Files (*.pdf)", options=options)
+        if file_path:
+            self.extract_resume_data(file_path)
+
+    def extract_information_from_text(self, text):
+        # Define patterns to search for relevant information
+        patterns = {
+            'name': r'Full Name:\s*(.*)',
+            'email': r'Email:\s*(.*)',
+            'phone': r'Phone:\s*(.*)',
+            'address': r'Address:\s*(.*)',
+            'education': r'Education:(.*?)Experience:',
+            'experience': r'Experience:(.*?)Skills:',
+            'skills': r'Skills:(.*)'
+        }
+
+        information = {}
+
+        # Extract information using regular expressions
+        for key, pattern in patterns.items():
+            match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if match:
+                information[key] = match.group(1).strip()
+
+        return information
+
+    def extract_resume_data(self, file_path):
+        doc = fitz.open(file_path)
+        text = ""
+        for page in doc:
+            text += page.get_text()
+        doc.close()
+
+        # Extract information from text
+        information = self.extract_information_from_text(text)
+
+        # Populate text fields
+        self.name_edit.setText(information.get('name', ''))
+        self.email_edit.setText(information.get('email', ''))
+        self.phone_edit.setText(information.get('phone', ''))
+        self.address_edit.setText(information.get('address', ''))
+        self.edu_edit.setText(information.get('education', ''))
+        self.exp_edit.setText(information.get('experience', ''))
+        self.skills_edit.setText(information.get('skills', ''))    
 
     def generate_resume(self):
         name = self.name_edit.text()
@@ -63,11 +121,11 @@ class ResumeBuilder(QWidget):
         address = self.address_edit.text()
         education = self.edu_edit.toPlainText()
         experience = self.exp_edit.toPlainText()
-        skills = self.skills_edit.text()
+        skills = self.skills_edit.toPlainText()  # Use toPlainText() instead of text
 
         # Get the file save location from the user
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getSaveFileName(self, "Save Resume", f"{name}_resume.pdf", "PDF Files (*.pdf)", options=options)
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Resume", f"{name}_resume.pdf", "PDF Files (*.pdf)", options=options) #For docx replace with _resume.docx", "DOCX Files (*.docx)"
 
         if file_path:
             doc = SimpleDocTemplate(file_path, pagesize=letter)
@@ -98,6 +156,18 @@ class ResumeBuilder(QWidget):
             # Skills
             elements.append(Paragraph('<b>Skills</b>', section_title_style))
             elements.append(Paragraph(skills, content_style))
+
+            # Certifications
+            elements.append(Paragraph('<b>Certificationss</b>', section_title_style))
+            elements.append(Paragraph(Certifications, content_style))
+
+
+            # Watermark with hyperlink
+            watermark_text = "This resume is created using <a href='https://github.com/afadeofred/ResumeBuilder/tree/main'>ResumeBuilder by Arun </a>"
+            watermark_style = ParagraphStyle(name='Watermark', parent=styles['Normal'], fontSize=10, textColor=colors.HexColor('#999999'))
+            watermark = Paragraph(watermark_text, watermark_style)
+            elements.append(Spacer(1, 36))  # Add space before the watermark
+            elements.append(watermark)
 
             doc.build(elements)
 
