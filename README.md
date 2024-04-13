@@ -6,7 +6,7 @@ pip install -r requirements.txt
 
 <h1> --This installs the required modules to run the script. </h1>
 
-![alt text](hhttps://github.com/afadeofred/ResumeBuilder/blob/main/Screenshot%202024-04-14%20085826.png)
+![alt text](https://github.com/afadeofred/ResumeBuilder/blob/main/Screenshot%202024-04-14%20085826.png)
 
 1. run py ResumeBuilder.py to run the GUI
 2. Fill in your information
