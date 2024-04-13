@@ -2,7 +2,7 @@
 A free ResumeBuilder made in Python uses PyQt5 GUI and saves resume in a PDF file upon taking input.
 
 How to Use:-
-pip install requirements.txt 
+pip install -r requirements.txt 
 
 <h1> --This installs the required modules to run the script. </h1>
 
