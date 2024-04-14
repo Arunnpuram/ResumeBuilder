@@ -1,4 +1,4 @@
-# ResumeBuilder
+# Resume Builder
 
 ![alt text](https://github.com/afadeofred/ResumeBuilder/blob/main/logo.png)
 
