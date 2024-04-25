@@ -34,6 +34,9 @@ class ResumeBuilder(QWidget):
         self.address_label = QLabel('Address:', self)
         self.address_edit = QLineEdit(self)
 
+        self.sum_label = QLabel('Summary:', self)
+        self.sum_edit = QTextEdit(self)
+
         self.edu_label = QLabel('Education:', self)
         self.edu_edit = QTextEdit(self)
 
@@ -71,6 +74,8 @@ class ResumeBuilder(QWidget):
         layout.addWidget(self.phone_edit)
         layout.addWidget(self.address_label)
         layout.addWidget(self.address_edit)
+        layout.addWidget(self.sum_label)
+        layout.addWidget(self.sum_edit)
         layout.addWidget(self.edu_label)
         layout.addWidget(self.edu_edit)
         layout.addWidget(self.exp_label)
@@ -100,6 +105,7 @@ class ResumeBuilder(QWidget):
         email = self.email_edit.text()
         phone = self.phone_edit.text()
         address = self.address_edit.text()
+        summary = self.edu_edit.toPlainText()
         education = self.edu_edit.toPlainText()
         experience = self.exp_edit.toPlainText()
         skills = self.skills_edit.toPlainText()
@@ -136,6 +142,11 @@ class ResumeBuilder(QWidget):
             # Header
             header_text = f"<b>{name}</b><br/>{email}<br/>{phone}<br/>{address}"
             elements.append(Paragraph(header_text, header_style))
+            elements.append(Spacer(1, 12))
+
+            # Summary
+            elements.append(Paragraph('<b>Summary</b>', section_title_style))
+            elements.append(Paragraph(summary.replace('\n', '<br/>'), content_style))
             elements.append(Spacer(1, 12))
 
             # Education
@@ -213,6 +224,7 @@ class ResumeBuilder(QWidget):
         self.email_edit.setText(information.get('email', ''))
         self.phone_edit.setText(information.get('phone', ''))
         self.address_edit.setText(information.get('address', ''))
+        self.edu_edit.setText(information.get('summary', ''))
         self.edu_edit.setText(information.get('education', ''))
         self.exp_edit.setText(information.get('experience', ''))
         self.skills_edit.setText(information.get('skills', ''))
