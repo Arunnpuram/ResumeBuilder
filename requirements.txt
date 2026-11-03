@@ -1,5 +1,5 @@
 PyQt5==5.15.11
 PyQt5_sip==12.17.0
-reportlab==4.4.2
+reportlab==4.5.1
 PyMuPDFb==1.24.10
 pillow>=10.3.0 # not directly required, pinned by Snyk to avoid a vulnerability
